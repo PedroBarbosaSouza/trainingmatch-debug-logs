@@ -1,0 +1,51 @@
+name: Prune old logs
+
+on:
+  schedule:
+    # Weekly, Sunday 03:00 UTC. Cron in repo CI uses UTC.
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prune-debug-logs
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Delete log files older than 14 days
+        run: |
+          set -euo pipefail
+          before=$(date -u -d '14 days ago' +%Y-%m-%d)
+          echo "Pruning logs/**/*.jsonl with date < ${before}"
+          # Filename format is YYYY-MM-DD.jsonl. Compare lexicographically.
+          deleted=0
+          while IFS= read -r f; do
+            base=$(basename "$f" .jsonl)
+            if [[ "$base" < "$before" ]]; then
+              echo "  - $f"
+              git rm -f "$f"
+              deleted=$((deleted + 1))
+            fi
+          done < <(find logs -type f -name '*.jsonl' 2>/dev/null || true)
+          echo "Deleted $deleted file(s)."
+          # Also drop empty deviceTag dirs that result from the prune.
+          find logs -type d -empty -delete 2>/dev/null || true
+
+      - name: Commit + push if anything changed
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            git config user.name 'debug-log-prune-bot'
+            git config user.email 'debug-log-prune-bot@users.noreply.github.com'
+            git commit -m "chore: prune logs older than 14 days"
+            git push
+          else
+            echo "Nothing to prune."
+          fi
