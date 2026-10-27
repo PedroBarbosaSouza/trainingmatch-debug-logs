@@ -1,0 +1,2 @@
+{"id":"xCvF7yZz7d9ZvxwDzcaz","at":"2026-10-27T00:08:18.143Z","level":"debug","message":"field.trace {\"stallMs\":975347,\"counts\":{},\"events\":[]}","sessionId":"acaac6bc-f6c4-4e03-bbd5-b892d7294520","userId":"7f9LVKsCrdYj3lSFHMnaB704tZD2","error":null,"stack":null}
+{"id":"mAklIGE9s8Qgr7DUMTQ0","at":"2026-10-27T00:08:18.212Z","level":"i","message":"workoutGpsTracker: in-window workouts = 0 []","sessionId":"acaac6bc-f6c4-4e03-bbd5-b892d7294520","userId":"7f9LVKsCrdYj3lSFHMnaB704tZD2","error":null,"stack":null}
